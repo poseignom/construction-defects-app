@@ -108,3 +108,24 @@ def create_test_users():
             db.session.add(user)
         
         db.session.commit()
+
+@main.route('/stats')
+@login_required
+def stats():
+    # Только руководитель может смотреть статистику
+    if current_user.role != 'leader':
+        flash('Доступ запрещен.')
+        return redirect(url_for('main.defects'))
+    
+    total_defects = Defect.query.count()
+    new_defects = Defect.query.filter_by(status='Новая').count()
+    in_progress_defects = Defect.query.filter_by(status='В работе').count()
+    in_review_defects = Defect.query.filter_by(status='На проверке').count()
+    closed_defects = Defect.query.filter_by(status='Закрыта').count()
+    
+    return render_template('stats.html',
+                         total_defects=total_defects,
+                         new_defects=new_defects,
+                         in_progress_defects=in_progress_defects,
+                         in_review_defects=in_review_defects,
+                         closed_defects=closed_defects)

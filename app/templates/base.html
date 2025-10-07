@@ -33,6 +33,11 @@
                             <a class="nav-link" href="{{ url_for('main.add_defect') }}">Добавить дефект</a>
                         </li>
                         {% endif %}
+                        {% if current_user.role == 'leader' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.stats') }}">Статистика</a>
+                        </li>
+                        {% endif %}
                     {% endif %}
                 </ul>
                 
