@@ -1,34 +1,32 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from flask_wtf.csrf import CSRFProtect  # Добавляем импорт
+from flask_wtf.csrf import CSRFProtect
 
 # Инициализация расширений
 db = SQLAlchemy()
 login_manager = LoginManager()
-csrf = CSRFProtect()  # Создаем экземпляр CSRF защиты
+csrf = CSRFProtect()
 
-def create_app():
+def create_app(config_class='config.Config'):
     app = Flask(__name__)
     
-    # Конфигурация
-    app.config['SECRET_KEY'] = 'secret-key-12345-change-in-production'
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///defects.db'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    # Загрузка конфигурации
+    app.config.from_object(config_class)
     
     # Инициализация расширений с приложением
     db.init_app(app)
     login_manager.init_app(app)
-    csrf.init_app(app)  # Инициализируем CSRF защиту
+    csrf.init_app(app)
     
     login_manager.login_view = 'main.login'
+    
+    # Инициализация security headers
+    from app.security import init_security_headers
+    init_security_headers(app)
     
     # Регистрация blueprints
     from app.routes import main as main_blueprint
     app.register_blueprint(main_blueprint)
-
-    # Инициализация security headers
-    from app.security import init_security_headers
-    init_security_headers(app)
     
     return app
