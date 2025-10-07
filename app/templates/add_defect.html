@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Добавление нового дефект</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Название дефекта *</label>
+                        <input type="text" class="form-control" id="title" name="title" required 
+                               placeholder="Введите краткое название дефекта">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Описание</label>
+                        <textarea class="form-control" id="description" name="description" rows="4" 
+                                  placeholder="Подробное описание дефекта"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="priority" class="form-label">Приоритет</label>
+                        <select class="form-select" id="priority" name="priority" required>
+                            <option value="Низкий">Низкий</option>
+                            <option value="Средний" selected>Средний</option>
+                            <option value="Высокий">Высокий</option>
+                        </select>
+                    </div>
+                    
+                    {% if current_user.role == 'manager' and engineers %}
+                    <div class="mb-3">
+                        <label for="assigned_to" class="form-label">Назначить исполнителя</label>
+                        <select class="form-select" id="assigned_to" name="assigned_to">
+                            <option value="">-- Не назначать --</option>
+                            {% for engineer in engineers %}
+                                <option value="{{ engineer.username }}">{{ engineer.username }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">Только менеджер может назначать исполнителей</div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('main.defects') }}" class="btn btn-secondary me-md-2">Отмена</a>
+                        <button type="submit" class="btn btn-primary">Добавить дефект</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

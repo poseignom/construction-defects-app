@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Список дефектов</h1>
+    {% if current_user.role in ['engineer', 'manager'] %}
+        <a href="{{ url_for('main.add_defect') }}" class="btn btn-primary">Добавить дефект</a>
+    {% endif %}
+</div>
+
+{% if defects %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Название</th>
+                    <th>Описание</th>
+                    <th>Приоритет</th>
+                    <th>Статус</th>
+                    <th>Автор</th>
+                    <th>Исполнитель</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for defect in defects %}
+                <tr class="defect-status-{{ defect.status|lower|replace(' ', '') }}">
+                    <td>{{ defect.id }}</td>
+                    <td><strong>{{ defect.title }}</strong></td>
+                    <td>{{ defect.description[:100] }}{% if defect.description|length > 100 %}...{% endif %}</td>
+                    <td>
+                        {% if defect.priority == 'Высокий' %}
+                            <span class="badge bg-danger">Высокий</span>
+                        {% elif defect.priority == 'Средний' %}
+                            <span class="badge bg-warning">Средний</span>
+                        {% else %}
+                            <span class="badge bg-success">Низкий</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if defect.status == 'Новая' %}
+                            <span class="badge bg-primary">Новая</span>
+                        {% elif defect.status == 'В работе' %}
+                            <span class="badge bg-warning">В работе</span>
+                        {% elif defect.status == 'На проверке' %}
+                            <span class="badge bg-info">На проверке</span>
+                        {% else %}
+                            <span class="badge bg-success">Закрыта</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ defect.author.username }}</td>
+                    <td>{{ defect.assigned_to.username if defect.assigned_to else 'Не назначен' }}</td>
+                    <td>
+                        {% if current_user.id == defect.author_id or current_user.id == defect.assigned_to_id %}
+                            {% if defect.status == 'Новая' %}
+                                <a href="{{ url_for('main.update_status', defect_id=defect.id, new_status='В работе') }}" 
+                                   class="btn btn-sm btn-warning" title="Взять в работу">В работу</a>
+                            {% elif defect.status == 'В работе' %}
+                                <a href="{{ url_for('main.update_status', defect_id=defect.id, new_status='На проверке') }}" 
+                                   class="btn btn-sm btn-info" title="Отправить на проверку">На проверку</a>
+                            {% elif defect.status == 'На проверке' %}
+                                <a href="{{ url_for('main.update_status', defect_id=defect.id, new_status='Закрыта') }}" 
+                                   class="btn btn-sm btn-success" title="Закрыть дефект">Закрыть</a>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="alert alert-info">
+        Пока нет дефектов. {% if current_user.role in ['engineer', 'manager'] %}<a href="{{ url_for('main.add_defect') }}">Добавьте первый дефект</a>{% endif %}
+    </div>
+{% endif %}
+{% endblock %}
