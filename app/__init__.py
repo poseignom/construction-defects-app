@@ -10,7 +10,7 @@ def create_app():
     app = Flask(__name__)
     
     # Конфигурация
-    app.config['SECRET_KEY'] = 'secret-key-12345'  # В реальном проекте нужно использовать сложный ключ
+    app.config['SECRET_KEY'] = 'secret-key-12345'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///defects.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
